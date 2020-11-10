@@ -3,40 +3,94 @@ using System.Collections.Generic;
 
 namespace GradeBook
 {
-    class Book {
+    public class Book {
         public Book(string name)
         {
             grades = new List<double>();
-            this.name = name;
+            Name = name;
+        }
+
+        public void AddLetterGrade(char letter)
+        {
+            switch (letter)
+            {
+                case 'A':
+                    AddGrade(90);
+                    break;
+                
+                case 'B':
+                    AddGrade(80);
+                    break;
+
+                case 'C':
+                    AddGrade(70);
+                    break;
+                
+                default:
+                    AddGrade(0);
+                    break;
+            }
         }
 
         public void AddGrade(double grade)
         {
-            grades.Add(grade);
+            if (grade <= 100 && grade >= 0)
+            {
+                grades.Add(grade);
+            }
+            else
+            {
+                throw new ArgumentException($"Invalid {nameof(grade)}: {grade}"); 
+            }
         }
 
-        public void ShowStatistics()
+        public Statistics GetStatistics()
         {          
-            var result = 0.0;
-            var highGrade = double.MinValue;
-            var lowGrade = double.MaxValue;
+            var result = new Statistics();
+            result.Average = 0.0;
+            result.High = double.MinValue;
+            result.Low = double.MaxValue;
 
-            foreach (var number in grades)
+            foreach (var grade in grades)
             {
-                highGrade = Math.Max(number, highGrade);
-                lowGrade = Math.Min(number, lowGrade);
-                result += number;
+                result.High = Math.Max(grade, result.High);
+                result.Low = Math.Min(grade, result.Low);
+                result.Average += grade;
             }
 
-            result /= grades.Count;
+            if (grades.Count > 0)
+            {
+                result.Average /= grades.Count;
+            }
 
-            Console.WriteLine($"Average grade is {result:N1}");
-            Console.WriteLine($"Max grade is {highGrade:N1}");
-            Console.WriteLine($"Min grade is {lowGrade:N1}");
+            switch(result.Average)
+            {
+                case var d when d >= 90.0:
+                    result.Letter = 'A';
+                    break;
+
+                case var d when d >= 80.0:
+                    result.Letter = 'B';
+                    break;
+
+                case var d when d >= 70.0:
+                    result.Letter = 'C';
+                    break;
+
+                case var d when d >= 60.0:
+                    result.Letter = 'D';
+                    break;
+
+                default:
+                    result.Letter = 'F';
+                    break;    
+            }
+
+            return result;
         }
 
         // Private members
         List<double> grades;
-        string name;
+        public string Name;
     }
 }
